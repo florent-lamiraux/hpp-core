@@ -32,6 +32,9 @@ namespace hpp {
 	(const Problem& problem, const RoadmapPtr_t& roadmap);
       /// Return shared pointer to new object.
       static DiffusingPlannerPtr_t create (const Problem& problem);
+      /// Try to make direct connection between init and goal
+      /// configurations, in order to avoid a random shoot.
+      virtual void tryDirectPath();
       /// One step of extension.
       virtual void oneStep ();
       /// Do nothing.

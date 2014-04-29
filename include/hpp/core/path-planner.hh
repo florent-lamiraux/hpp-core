@@ -48,6 +48,9 @@ namespace hpp {
       /// Users can implement themselves the loop to avoid being trapped
       /// in an infinite loop when no solution is found.
       virtual PathVectorPtr_t solve ();
+      /// User implementation of a try to connect directly init and goal
+      /// configurations.
+      virtual void tryDirectPath () = 0;
       /// User implementation of one step of resolution
       virtual void oneStep () = 0;
       /// Post processing of the resulting path

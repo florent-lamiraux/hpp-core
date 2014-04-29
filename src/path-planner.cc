@@ -25,7 +25,8 @@ namespace hpp {
   namespace core {
 
     PathPlanner::PathPlanner (const Problem& problem) :
-      problem_ (problem), roadmap_ (Roadmap::create (problem.distance (), problem.robot())),
+      problem_ (problem), roadmap_ (Roadmap::create (problem.distance (), 
+						     problem.robot())),
       interrupt_ (false)
     {
     }
@@ -65,6 +66,8 @@ namespace hpp {
       interrupt_ = false;
       bool solved = false;
       startSolve ();
+      tryDirectPath();
+      solved = pathExists ();
       if (interrupt_) throw std::runtime_error ("Interruption");
       while (!solved) {
 	oneStep ();

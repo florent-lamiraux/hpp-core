@@ -30,7 +30,7 @@
 namespace hpp {
   namespace core {
     ProblemSolver::ProblemSolver () :
-      robot_ (), robotChanged_ (false), problem_ (),
+      robot_ (), robotChanged_ (false), problem_ (), obstacleLoaded_(false),
       initConf_ (), goalConfigurations_ (),
       pathPlannerType_ ("DiffusingPlanner"),
       pathOptimizerType_ ("RandomShortcut"), roadmap_ (), paths_ (),
@@ -123,7 +123,9 @@ namespace hpp {
       // Set obstacles
       problem_->collisionObstacles(collisionObstacles_);
       problem_->distanceObstacles(distanceObstacles_);
-      
+      if(obstacleLoaded_) // If collision obstacle added, reset Roadmap
+	roadmap_ = Roadmap::create (problem_->distance (), problem_->robot());
+
       PathPlannerBuilder_t createPlanner =
 	pathPlannerFactory_ [pathPlannerType_];
       pathPlanner_ = createPlanner (*problem_, roadmap_);
@@ -134,6 +136,7 @@ namespace hpp {
       // Reset init and goal configurations
       problem_->initConfig (initConf_);
       problem_->resetGoalConfigs ();
+      obstacleLoaded_=false;
       for (Configurations_t::const_iterator itConfig =
 	     goalConfigurations_.begin ();
 	   itConfig != goalConfigurations_.end (); itConfig++) {
@@ -149,8 +152,10 @@ namespace hpp {
 				     bool collision, bool distance)
     {
       
-      if (collision)
+      if (collision){
 	collisionObstacles_.push_back (object);
+	obstacleLoaded_=true;
+	}
       if (distance)
 	distanceObstacles_.push_back (object);
       if (problem ())
