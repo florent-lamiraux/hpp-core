@@ -91,33 +91,8 @@ namespace hpp {
       }
       return (*sm) (*(near->configuration ()), *target);
     }
-    
-    void DiffusingPlanner::tryDirectPath ()
-    {
-      // call steering method here to build a direct conexion 
-      const SteeringMethodPtr_t& sm (problem ().steeringMethod ());
-      PathValidationPtr_t pathValidation (problem ().pathValidation ());
-      PathPtr_t validPath, path;
-      NodePtr_t initNode = roadmap ()->initNode();
-      for (Nodes_t::const_iterator itn = roadmap ()->goalNodes ().begin();
-	   itn != roadmap ()->goalNodes ().end (); ++itn) {
-	ConfigurationPtr_t q1 ((initNode)->configuration ());
-	ConfigurationPtr_t q2 ((*itn)->configuration ());
-	assert (*q1 != *q2); // init and goal config must be different?
-	path = (*sm) (*q1, *q2);
-	bool pathValid = pathValidation->validate (path, false, validPath);
-	if (pathValid && validPath->timeRange ().second != 
-	    path->timeRange ().first) {
-	  roadmap ()->addEdge (initNode, *itn, path);
-	  interval_t timeRange = path->timeRange ();
-	  roadmap ()->addEdge (*itn, initNode, path->extract
-			       (interval_t (timeRange.second,
-					    timeRange.first)));
-	}
-      }
-    }
-    
 
+    
     void DiffusingPlanner::oneStep ()
     {
       DevicePtr_t robot (problem ().robot ());
