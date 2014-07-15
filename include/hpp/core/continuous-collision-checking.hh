@@ -16,21 +16,19 @@
 // hpp-core  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef HPP_CORE_PATH_VALIDATION_HH
-# define HPP_CORE_PATH_VALIDATION_HH
+#ifndef HPP_CORE_CONTINUOUS_COLLISION_CHECKING_HH
+# define HPP_CORE_CONTINUOUS_COLLISION_CHECKING_HH
 
-# include <hpp/core/config.hh>
-# include <hpp/core/fwd.hh>
+# include <hpp/core/path-validation.hh>
 
 namespace hpp {
   namespace core {
-    /// Abstraction of path validation
-    ///
-    /// Instances of this class compute the latest valid configuration along
-    /// a path.
-    class HPP_CORE_DLLAPI PathValidation
+    /// Continuous validation of a path for collision
+    class HPP_CORE_DLLAPI ContinuousCollisionChecking : public PathValidation
     {
     public:
+      static ContinuousCollisionCheckingPtr_t
+	create (const DevicePtr_t& robot);
       /// Compute the biggest valid interval starting from the path beginning
       ///
       /// \param path the path to check for validity,
@@ -39,13 +37,12 @@ namespace hpp {
       ///         path is valid.
       /// \return whether the whole path is valid.
       virtual bool validate (const PathPtr_t& path, bool reverse,
-			     PathPtr_t& validPart) = 0;
+			     PathPtr_t& validPart);
     protected:
-      PathValidation ()
-      {
-      }
-    }; // class PathValidation
+      ContinuousCollisionChecking (const DevicePtr_t& robot);
+    private:
+      DevicePtr_t robot_;
+    }; // class ContinuousCollisionChecking
   } // namespace core
 } // namespace hpp
-
-#endif // HPP_CORE_PATH_VALIDATION_HH
+#endif // HPP_CORE_CONTINUOUS_COLLISION_CHECKING_HH

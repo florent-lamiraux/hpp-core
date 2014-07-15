@@ -26,6 +26,7 @@ SET(${LIBRARY_NAME}_SOURCES
   config-validations.cc
   constraint.cc
   constraint-set.cc
+  continuous-collision-checking.cc
   diffusing-planner.cc
   discretized-collision-checking.cc
   extracted-path.hh

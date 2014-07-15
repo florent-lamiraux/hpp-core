@@ -52,3 +52,4 @@ CONFIG_FILES (
   )
 
 ADD_TESTCASE (test-kdTree TRUE)
+ADD_TESTCASE (test-intervals FALSE)
