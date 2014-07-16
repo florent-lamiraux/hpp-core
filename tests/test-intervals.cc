@@ -21,7 +21,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 using hpp::core::interval_t;
-using hpp::core::Intervals;
+using hpp::core::continuousCollisionChecking::Intervals;
 
 bool checkIntervals (const Intervals& intervals)
 {
