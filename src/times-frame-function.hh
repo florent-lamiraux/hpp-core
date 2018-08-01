@@ -18,10 +18,20 @@
 # define HPP_CORE_SRC_TIMES_FRAME_FUNCTION_HH
 
 #include <Eigen/Geometry>
+#include <pinocchio/spatial/explog.hpp>
+#include <hpp/pinocchio/liegroup-element.hh>
 #include <hpp/constraints/differentiable-function.hh>
 
 namespace hpp {
   namespace core {
+    typedef constraints::vector6_t vector6_t;
+    typedef pinocchio::LiegroupConstElementRef LiegroupConstElementRef;
+    /// Right multiplication be a constant in SE(3)
+    ///
+    /// Mapping from SE(3) to SE(3) that maps
+    ///
+    ///    x -> x + log (M)
+    /// where M is a constant element of SE (3)
     struct TimesFrameFunction : public DifferentiableFunction {
 
       typedef Eigen::Quaternion<value_type>  Quaternion_t;
@@ -29,7 +39,7 @@ namespace hpp {
 
       TimesFrameFunction (const Transform3f& M, std::string name)
         : DifferentiableFunction (7, 6, LiegroupSpace::SE3 (), name),
-        oMi_ (M),
+          oMi_ (M), logM_ (se3::log6 (M).toVector ()),
         oQi_ (M.rotation())
       {}
 
@@ -45,6 +55,9 @@ namespace hpp {
         QuaternionMap_t iQ (x.tail<4>().data());
         y.vector().head<3>() = iQ._transformVector(oMi_.translation()) + x.head<3>();
         y.vector().tail<4>() = (iQ * oQi_).coeffs();
+        LiegroupConstElementRef x1 (x, LiegroupSpace::SE3 ());
+        LiegroupElement y1 (x1 + logM_);
+        assert ((y - y1).squaredNorm () < 1e-12);
       }
 
       /** Returns a constant Jacobian.
@@ -70,6 +83,7 @@ namespace hpp {
       }
 
       Transform3f oMi_;
+      vector6_t logM_;
       Quaternion_t oQi_;
     };
   } // namespace core
