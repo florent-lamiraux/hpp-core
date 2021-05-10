@@ -93,6 +93,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/core/path-optimization/simple-time-parameterization.hh
   include/hpp/core/path-optimization/spline-gradient-based.hh
   include/hpp/core/path-optimization/spline-gradient-based-abstract.hh
+  include/hpp/core/path-optimization/spline-gradient-based-constraint.hh
   include/hpp/core/path-optimizer.hh
   include/hpp/core/path-planner.hh
   include/hpp/core/path-planner/k-prm-star.hh
@@ -188,6 +189,7 @@ SET(${PROJECT_NAME}_SOURCES
   src/path-optimizer.cc #
   src/path-optimization/linear-constraint.cc #
   src/path-optimization/spline-gradient-based-abstract.cc #
+  src/path-optimization/spline-gradient-based-constraint.cc #
   src/path-optimization/partial-shortcut.cc #
   src/path-optimization/random-shortcut.cc
   src/path-optimization/simple-shortcut.cc

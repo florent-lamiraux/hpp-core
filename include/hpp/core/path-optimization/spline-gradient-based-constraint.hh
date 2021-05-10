@@ -1,5 +1,5 @@
 // Copyright (c) 2017 CNRS
-// Authors: Joseph Mirabel
+// Authors: Joseph Mirabel, Aamr el Kazdadi
 //
 // This file is part of hpp-core
 // hpp-core is free software: you can redistribute it
@@ -18,9 +18,7 @@
 #ifndef HPP_CORE_PATH_OPTIMIZATION_SPLINE_GRADIENT_BASED_CONSTRAINT_HH
 # define HPP_CORE_PATH_OPTIMIZATION_SPLINE_GRADIENT_BASED_CONSTRAINT_HH
 
-#include <hpp/constraints/explicit-solver.hh>
-
-#include <hpp/constraints/hybrid-solver.hh>
+#include <hpp/constraints/solver/by-substitution.hh>
 #include <hpp/core/config-projector.hh>
 
 #include <hpp/core/path-optimization/spline-gradient-based-abstract.hh>
@@ -40,6 +38,7 @@ namespace hpp {
       {
         public:
           typedef SplineGradientBasedAbstract<_PolynomeBasis, _SplineOrder> Base;
+          typedef constraints::solver::BySubstitution BySubstitution;
           enum {
             PolynomeBasis = _PolynomeBasis,
             SplineOrder = _SplineOrder
@@ -69,7 +68,7 @@ namespace hpp {
           virtual PathVectorPtr_t optimize (const PathVectorPtr_t& path);
 
         protected:
-          using typename Base::ExplicitSolver;
+          typedef constraints::ExplicitConstraintSet ExplicitConstraintSet;
           using typename Base::RowBlockIndices;
           using typename Base::SplineOptimizationData;
           using typename Base::SplineOptimizationDatas_t;
@@ -94,7 +93,7 @@ namespace hpp {
 
           // Create trajectory constraints from configuration constraints
           virtual void addProblemConstraints (const Splines_t splines,
-              HybridSolver& hybridSolver, LinearConstraint& constraint,
+              BySubstitution& hybridSolver, LinearConstraint& constraint,
               std::vector<size_type>& dofPerSpline, std::vector<size_type>& argPerSpline,
               std::vector<size_type>& constraintSplineIndex,
               std::vector<size_type>& constraintOutputSize,
@@ -102,20 +101,20 @@ namespace hpp {
 
           // Create trajectory continuity constraints
           // TODO:priority:2-3: Non-linear continuity constraints
-          void processContinuityConstraints (const Splines_t splines, HybridSolver hybridSolver,
+          void processContinuityConstraints (const Splines_t splines, BySubstitution hybridSolver,
               LinearConstraint& continuityConstraints, LinearConstraint& linearConstraints) const;
 
           // Remove redundant constraints
           void processInequalityConstraints (const LinearConstraint& boundConstraint,
               LinearConstraint& boundConstraintReduced, const Splines_t& splines,
-              const HybridSolver& hybridSolver, const LinearConstraint& linearConstraints,
+              const BySubstitution& hybridSolver, const LinearConstraint& linearConstraints,
               const std::vector<size_type>& dofPerSpline) const;
 
           // Create trajectory space as concatenation of configuration spaces
           // Unnecessarily hacky at times (computing Jacobians, Hessians)
           // TODO:priority:4: Handle configuration spaces individually
           LiegroupSpacePtr_t createProblemLieGroup(std::vector<LiegroupSpacePtr_t>& splineSpaces,
-              const Splines_t splines, const HybridSolver hybridSolver) const;
+              const Splines_t splines, const BySubstitution hybridSolver) const;
 
           void costFunction (const Splines_t splines, const LinearConstraint& linearConstraints,
               std::vector<size_type> dofPerSpline, matrix_t& hessian, vector_t& gradientAtZero, value_type& valueAtZero) const;
@@ -128,46 +127,46 @@ namespace hpp {
 
           // H_i = finite difference formula of Jacobian of grad(g_i)
           void getHessianFiniteDiff (const vector_t x, Splines_t& splines,
-              std::vector<matrix_t>& hessianStack, HybridSolver& hybridSolver,
+              std::vector<matrix_t>& hessianStack, BySubstitution& hybridSolver,
               const std::vector<size_type>& dofPerSpline, const LiegroupSpacePtr_t stateSpace) const;
 
           void getFullSplines (const vector_t reducedParams, Splines_t& fullSplines,
-              HybridSolver hybridSolver) const;
+              BySubstitution hybridSolver) const;
 
           void addCollisionConstraint(Splines_t collisionFreeSplines, Splines_t collisionSplines,
               std::pair<CollisionPathValidationReportPtr_t, std::size_t> collisionReport);
 
           void getConstraintsValue(const vector_t x, Splines_t& splines, vectorOut_t value,
-              HybridSolver& hybridSolver) const;
+              BySubstitution& hybridSolver) const;
 
           void getCollisionConstraintsValue (const vector_t x, Splines_t& splines,
-              vectorOut_t value, HybridSolver& hybridSolver) const;
+              vectorOut_t value, BySubstitution& hybridSolver) const;
 
           void getConstraintsValueJacobian(const vector_t x, Splines_t& splines, vectorOut_t value,
               matrixOut_t jacobian, const std::vector<size_type>& dofPerSpline,
-              HybridSolver& hybridSolver, const LiegroupSpacePtr_t stateSpace) const;
+              BySubstitution& hybridSolver, const LiegroupSpacePtr_t stateSpace) const;
 
           void getCollisionConstraintsValueJacobian (const vector_t x, Splines_t& splines, vectorOut_t value,
-              matrixOut_t jacobian, HybridSolver& hybridSolver, const std::vector<size_type>& dofPerSpline,
+              matrixOut_t jacobian, BySubstitution& hybridSolver, const std::vector<size_type>& dofPerSpline,
               const std::vector<LiegroupSpacePtr_t>& splineSpaces) const;
 
           void getConstraintsHessian (const vector_t x, Splines_t& splines, std::vector<matrix_t>& hessianStack,
               const std::vector<size_type>& dofPerSpline,
-              HybridSolver& hybridSolver, const LiegroupSpacePtr_t stateSpace,
+              BySubstitution& hybridSolver, const LiegroupSpacePtr_t stateSpace,
               const std::vector<size_type>& constraintSplineIndex) const;
 
           void getCollisionConstraintsHessians (const vector_t x, Splines_t& splines,
               std::vector<matrix_t>& hessianStack, const std::vector<size_type>& dofPerSpline,
-              HybridSolver& hybridSolver, const std::vector<LiegroupSpacePtr_t>& splineSpaces) const;
+              BySubstitution& hybridSolver, const std::vector<LiegroupSpacePtr_t>& splineSpaces) const;
 
           // J = (dg_i/dx_j), 0 <= i,j < k,n
           void getJacobianFiniteDiff (const vector_t x, Splines_t& splines,
-              matrixOut_t jacobian, HybridSolver& hybridSolver) const;
+              matrixOut_t jacobian, BySubstitution& hybridSolver) const;
 
           // H_i = (d^2 g_i/dx_j^2), 0 <= i,j < n
           void getHessianDoubleFiniteDiff (const vector_t x, Splines_t& splines,
               std::vector<matrix_t>& hessianStack,
-              HybridSolver hybridSolver) const;
+              BySubstitution hybridSolver) const;
 
           vector_t getSecondOrderCorrection (const vector_t step, const matrix_t& jacobian,
               const std::vector<matrix_t>& hessianStack, const matrix_t& inverseGram, const matrix_t& PK) const;
