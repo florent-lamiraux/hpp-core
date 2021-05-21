@@ -91,8 +91,8 @@ namespace hpp {
     {
       using constraints::Transformation;
       using constraints::RelativeTransformation;
-      using constraints::TransformationR3xSO3;
-      using constraints::RelativeTransformationR3xSO3;
+      using constraints::TransformationSE3;
+      using constraints::RelativeTransformationSE3;
       assert (robot);
       assert (c);
 
@@ -141,19 +141,19 @@ namespace hpp {
         if (!check <Transformation>::is (nc->functionPtr (), i1, i2)) {
           hppDout (info, "Constraint function " << nc->functionPtr()->name ()
                    << " is not of type Transformation");
-	  if (!check <TransformationR3xSO3>::is (nc->functionPtr (), i1, i2)) {
+	  if (!check <TransformationSE3>::is (nc->functionPtr (), i1, i2)) {
 	    hppDout (info, "Constraint function " << nc->functionPtr()->name ()
-		     << " is not of type TransformationR3xSO3");
+		     << " is not of type TransformationSE3");
 	    if (!check <RelativeTransformation>::is
 		(nc->functionPtr (), i1, i2)) {
 	      hppDout (info, "Constraint function "
 		       << nc->functionPtr()->name ()
 		       << " is not of type RelativeTransformation");
-	      if (!check <RelativeTransformationR3xSO3>::is
+	      if (!check <RelativeTransformationSE3>::is
 		  (nc->functionPtr (), i1, i2)) {
 		hppDout (info, "Constraint function "
 			 << nc->functionPtr()->name ()
-			 << " is not of type RelativeTransformationR3xSO3");
+			 << " is not of type RelativeTransformationSE3");
 		continue;
 	      }
 	    }
